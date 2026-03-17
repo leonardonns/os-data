@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retífica Monteiro - Registro de Serviços</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- TELA DE LOGIN                      -->
+  <!-- ══════════════════════════════════ -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <h1>Retífica Monteiro</h1>
+      <div class="sub">Faça login para acessar o sistema</div>
+
+      <button class="btn-google" onclick="loginComGoogle()">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 000 24c0 3.77.9 7.35 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Entrar com Google
+      </button>
+
+      <div class="login-divisor">
+        <span>ou entre com e-mail</span>
+      </div>
+
+      <label for="loginEmail">E-mail</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com" onkeydown="if(event.key==='Enter') loginComEmail()">
+
+      <label for="loginSenha">Senha</label>
+      <input type="password" id="loginSenha" placeholder="Sua senha" onkeydown="if(event.key==='Enter') loginComEmail()">
+
+      <button class="primary" id="btnLogin" onclick="loginComEmail()">Entrar com e-mail</button>
+
+      <div class="login-error" id="loginErro"></div>
+
+      <div class="login-toggle" id="loginToggle">
+        Primeiro acesso? <a onclick="alternarModoLogin()">Criar conta com e-mail</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- TELA DE ACESSO NEGADO              -->
+  <!-- ══════════════════════════════════ -->
+  <div class="login-overlay hidden" id="acessoNegado">
+    <div class="login-box" style="text-align:center">
+      <div style="font-size:48px;margin-bottom:12px">🚫</div>
+      <h1 style="font-size:20px">Acesso não autorizado</h1>
+      <div class="sub">O e-mail <strong id="emailNegado">-</strong> não tem permissão para acessar o sistema.</div>
+      <div class="small" style="margin-bottom:16px">Solicite ao administrador que adicione seu e-mail à lista de autorizados.</div>
+      <button class="primary" onclick="voltarParaLogin()">Voltar ao login</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- SISTEMA PRINCIPAL                   -->
+  <!-- ══════════════════════════════════ -->
+  <div class="wrap hidden" id="sistemaApp">
+    <div class="card">
+      <div class="user-bar">
+        <div>
+          <h1>Retífica Monteiro - Registro de Serviços</h1>
+          <div class="sub">Cadastro, busca e edição dos registros — acessível de qualquer computador.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div style="display:flex;gap:6px">
+            <button class="secondary" onclick="abrirGerenciarUsuarios()" style="font-size:12px;padding:6px 12px" id="btnAdmin">Usuários</button>
+            <button class="secondary" onclick="fazerLogout()" style="font-size:12px;padding:6px 12px">Sair</button>
+          </div>
+          <div class="user-info">Logado como: <strong id="userEmail">-</strong></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px">
+        <div class="pill" id="modoLabel">Modo: Novo cadastro</div>
+        <div class="status-bar">
+          <div class="status-dot" id="statusDot"></div>
+          <span class="small" id="statusText">Verificando conexão...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de gerenciar usuários -->
+    <div class="card hidden" id="painelUsuarios">
+      <h2>Gerenciar Usuários Autorizados</h2>
+      <div class="sub">Adicione ou remova e-mails que podem acessar o sistema.</div>
+      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <label for="novoEmail">E-mail do novo usuário</label>
+          <input id="novoEmail" type="email" placeholder="funcionario@email.com" onkeydown="if(event.key==='Enter') adicionarUsuario()">
+        </div>
+        <button class="primary" onclick="adicionarUsuario()" style="height:42px">Adicionar</button>
+      </div>
+      <div id="listaUsuarios" style="margin-top:12px"></div>
+      <button class="secondary" onclick="fecharGerenciarUsuarios()" style="margin-top:10px">Fechar</button>
+    </div>
+
+    <div class="card" id="formCard">
+      <h2 id="formTitulo">Nova Ordem de Serviço</h2>
+      <div class="grid">
+        <div>
+          <label for="os">Número da OS</label>
+          <input id="os" placeholder="Ex.: 1543">
+        </div>
+        <div>
+          <label for="cliente">Cliente</label>
+          <input id="cliente" placeholder="Nome do cliente">
+        </div>
+        <div>
+          <label for="motor">Motor</label>
+          <input id="motor" placeholder="Ex.: OM457">
+        </div>
+        <div>
+          <label for="veiculo">Veículo</label>
+          <input id="veiculo" placeholder="Ex.: MB Axor 3131">
+        </div>
+        <div class="full">
+          <label for="servico">Serviço executado</label>
+          <textarea id="servico" placeholder="Descreva o serviço executado"></textarea>
+        </div>
+        <div class="full">
+          <label for="arquivos">Adicionar arquivos</label>
+          <input type="file" id="arquivos" multiple>
+          <div class="small" style="margin-top:4px">Aceita fotos, PDFs, planilhas e qualquer outro arquivo.</div>
+          <div class="upload-progress hidden" id="uploadProgress">
+            <div class="upload-progress-bar" id="uploadBar"></div>
+          </div>
+          <div class="upload-status hidden" id="uploadStatus"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" onclick="salvarRegistro()" id="btnSalvar">Salvar OS</button>
+        <button class="secondary hidden" onclick="cancelarEdicao()" id="btnCancelar">Cancelar edição</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Buscar registros</h2>
+      <input id="busca" class="search" placeholder="Buscar por OS, cliente, motor ou veículo" oninput="filtrarLista()">
+      <div class="small" style="margin-top:8px">Dica: toque em <b>Editar</b> para alterar um registro já salvo.</div>
+    </div>
+
+    <div id="lista"></div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="this.classList.remove('active')">
+    <img id="lightboxImg" src="" alt="Foto ampliada">
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+  <!-- Aplicação -->
+  <script src="app.js"></script>
+
+</body>
+</html>
