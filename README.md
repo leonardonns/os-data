@@ -1,67 +1,124 @@
-Retífica Monteiro
-Guia Passo a Passo — Configuração do Firebase
+# Retífica Monteiro — Sistema de Ordens de Serviço
 
-Este guia vai te ajudar a colocar o sistema de registro de serviços no ar usando o Firebase do Google (gratuito). Ao final, qualquer computador ou celular poderá acessar e cadastrar ordens de serviço com fotos.
-Etapa 1 — Criar o Projeto no Firebase
-1.	Acesse console.firebase.google.com e faça login com sua conta Google (a mesma do Gmail serve).
-2.	Clique em "Adicionar projeto" (ou "Add project").
-3.	Dê um nome ao projeto, por exemplo: retifica-monteiro.
-4.	Na tela do Google Analytics, pode desativar (não é necessário). Clique em "Criar projeto".
-5.	Aguarde criar e clique em "Continuar".
-Etapa 2 — Ativar o Firestore (Banco de Dados)
-6.	No menu lateral esquerdo, clique em "Criação" > "Firestore Database".
-7.	Clique em "Criar banco de dados".
-8.	Escolha o local do servidor. Recomendo southamerica-east1 (São Paulo).
-9.	Selecione "Iniciar no modo de teste" (isso permite leitura e escrita por 30 dias — depois vamos ajustar as regras).
-10.	Clique em "Criar".
-Etapa 3 — Ativar o Storage (Armazenamento de Fotos)
-11.	No menu lateral, clique em "Criação" > "Storage".
-12.	Clique em "Começar".
-13.	Selecione "Iniciar no modo de teste" e clique em "Próxima".
-14.	Confirme o local (mesmo do Firestore) e clique em "Concluído".
-Etapa 4 — Obter a Configuração do Firebase
-Esta é a parte mais importante — você vai copiar os dados de conexão para colar no arquivo HTML.
-15.	Na página inicial do projeto, clique no ícone </> (Web) para registrar um app da web.
-16.	Dê um apelido ao app, por exemplo: sistema-os. Não precisa marcar "Firebase Hosting" agora.
-17.	Clique em "Registrar app".
-18.	Vai aparecer um bloco de código. Procure o objeto firebaseConfig — ele se parece com isso:
+Sistema web para registro, busca e gerenciamento de ordens de serviço com suporte a upload de fotos. Desenvolvido para funcionar em qualquer dispositivo (desktop, tablet ou celular) com armazenamento em nuvem via Firebase.
+
+## Funcionalidades
+
+- Cadastro de ordens de serviço (OS, cliente, motor, veículo, serviço executado)
+- Upload de múltiplas fotos por registro
+- Busca e filtro por OS, cliente, motor ou veículo
+- Edição e exclusão de registros
+- Interface responsiva
+- Armazenamento em nuvem (Firebase Firestore + Storage)
+- Hospedagem gratuita via Firebase Hosting
+
+## Tecnologias
+
+| Camada        | Tecnologia                          |
+|---------------|-------------------------------------|
+| Front-end     | HTML, CSS, JavaScript (vanilla)     |
+| Banco de dados| Firebase Firestore                  |
+| Armazenamento | Firebase Storage                    |
+| Hospedagem    | Firebase Hosting                    |
+
+---
+
+## Guia de Configuração
+
+### Pré-requisitos
+
+- Conta Google (Gmail)
+- [Node.js](https://nodejs.org) (versão LTS) — necessário apenas para deploy
+
+### 1. Criar o projeto no Firebase
+
+1. Acesse [console.firebase.google.com](https://console.firebase.google.com) e faça login.
+2. Clique em **Adicionar projeto**.
+3. Nomeie o projeto (ex.: `retifica-monteiro`).
+4. Desative o Google Analytics (opcional) e clique em **Criar projeto**.
+
+### 2. Ativar o Firestore (banco de dados)
+
+1. No menu lateral, acesse **Criação > Firestore Database**.
+2. Clique em **Criar banco de dados**.
+3. Selecione o local `southamerica-east1` (São Paulo).
+4. Escolha **Iniciar no modo de teste** e clique em **Criar**.
+
+### 3. Ativar o Storage (armazenamento de fotos)
+
+1. No menu lateral, acesse **Criação > Storage**.
+2. Clique em **Começar**.
+3. Selecione **Iniciar no modo de teste** e confirme o local.
+
+### 4. Obter a configuração do Firebase
+
+1. Na página inicial do projeto, clique no ícone **</>** (Web) para registrar um app.
+2. Dê um apelido (ex.: `sistema-os`). Não é necessário marcar "Firebase Hosting" neste momento.
+3. Clique em **Registrar app**.
+4. Copie o objeto `firebaseConfig` que será exibido:
+
+```javascript
 const firebaseConfig = {
   apiKey: "AIzaSy...",
-  authDomain: "retifica-monteiro.firebaseapp.com",
-  projectId: "retifica-monteiro",
-  storageBucket: "retifica-monteiro.appspot.com",
+  authDomain: "seu-projeto.firebaseapp.com",
+  projectId: "seu-projeto",
+  storageBucket: "seu-projeto.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123456789:web:abc..."
 };
-19.	Copie todo esse bloco. Você vai colar no arquivo index.html no local indicado (onde diz "COLE AQUI").
-Etapa 5 — Configurar o Arquivo HTML
-20.	Abra o arquivo index.html (o novo que eu preparei) em um editor de texto — pode ser o Bloco de Notas, Notepad++ ou VS Code.
-21.	Procure por "COLE_AQUI" (use Ctrl+H para Localizar e Substituir).
-22.	Substitua cada valor "COLE_AQUI" pelo valor correspondente da configuração que copiou na Etapa 4.
-23.	Salve o arquivo.
-Etapa 6 — Colocar no Ar com Firebase Hosting (Gratuito)
-Para que outros computadores acessem, você precisa hospedar o arquivo. O Firebase Hosting é gratuito e simples.
-Opção A — Pelo terminal (recomendado)
-24.	Instale o Node.js: acesse nodejs.org e baixe a versão LTS.
-25.	Abra o Prompt de Comando (CMD) e digite: npm install -g firebase-tools
-26.	Faça login: firebase login
-27.	Crie uma pasta no computador (ex: C:\retifica-site) e coloque o index.html dentro dela.
-28.	No CMD, navegue até a pasta: cd C:\retifica-site
-29.	Inicialize o projeto: firebase init hosting
-Nas perguntas que aparecem:
-a)	Selecione o projeto que você criou (retifica-monteiro).
-b)	Public directory: digite . (um ponto, que significa "esta pasta").
-c)	Single-page app: responda N (não).
-d)	Overwrite index.html: responda N (não).
-30.	Publique: firebase deploy
-31.	Pronto! O terminal vai mostrar o link do site, algo como: retifica-monteiro.web.app. Acesse de qualquer computador ou celular!
-Opção B — Sem terminal (rede local)
-Se quiser testar rápido só na sua rede local (sem publicar na internet): coloque o arquivo index.html em uma pasta compartilhada da rede e abra nos outros computadores. Funciona, mas só dentro da sua rede Wi-Fi/LAN.
-Etapa 7 — Ajustar Regras de Segurança (Importante!)
-O modo de teste expira em 30 dias. Antes disso, ajuste as regras para manter o acesso funcionando.
-Regras do Firestore
-32.	No console do Firebase, vá em Firestore Database > Regras.
-33.	Substitua tudo por:
+```
+
+### 5. Configurar o arquivo HTML
+
+1. Abra o arquivo `index.html` em um editor de texto.
+2. Localize o trecho `firebaseConfig` e substitua os valores pelos dados obtidos na etapa anterior.
+3. Salve o arquivo.
+
+### 6. Deploy com Firebase Hosting
+
+```bash
+# Instalar as ferramentas do Firebase
+npm install -g firebase-tools
+
+# Fazer login
+firebase login
+
+# Navegar até a pasta do projeto
+cd caminho/para/o/projeto
+
+# Inicializar o hosting
+firebase init hosting
+```
+
+Durante a inicialização, responda:
+
+| Pergunta              | Resposta                               |
+|-----------------------|----------------------------------------|
+| Projeto               | Selecione o projeto criado             |
+| Public directory      | `.` (ponto — pasta atual)              |
+| Single-page app       | `N`                                    |
+| Overwrite index.html  | `N`                                    |
+
+```bash
+# Publicar
+firebase deploy
+```
+
+Após o deploy, o terminal exibirá a URL do site (ex.: `https://retifica-monteiro.web.app`).
+
+> **Alternativa sem terminal:** para testes em rede local, basta colocar o `index.html` em uma pasta compartilhada e abri-lo nos demais dispositivos da rede.
+
+---
+
+## Regras de Segurança
+
+O modo de teste expira em 30 dias. Antes disso, atualize as regras para manter o acesso funcionando.
+
+### Firestore
+
+No console do Firebase, acesse **Firestore Database > Regras** e substitua pelo conteúdo abaixo:
+
+```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -70,10 +127,13 @@ service cloud.firestore {
     }
   }
 }
-34.	Clique em "Publicar".
-Regras do Storage
-35.	Vá em Storage > Regras.
-36.	Substitua tudo por:
+```
+
+### Storage
+
+Acesse **Storage > Regras** e substitua por:
+
+```
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
@@ -82,30 +142,34 @@ service firebase.storage {
     }
   }
 }
-37.	Clique em "Publicar".
-Nota de segurança: essas regras permitem acesso aberto (qualquer pessoa com o link pode ler e escrever). Para uso interno de uma retífica isso normalmente é suficiente. Se quiser proteger com login no futuro, podemos adicionar autenticação por e-mail/senha.
-Limites do Plano Gratuito
-•	Firestore: 1 GB de dados, 50.000 leituras/dia, 20.000 escritas/dia.
-•	Storage: 5 GB para fotos.
-•	Hosting: 10 GB de transferência/mês.
-•	Para uma retífica com uso normal, esses limites são mais que suficientes.
-Dúvidas Frequentes
-Preciso pagar algo?
-Não. O plano Spark do Firebase é totalmente gratuito dentro dos limites acima.
-E se eu perder meu computador?
-Os dados ficam salvos nos servidores do Google (Firebase). Basta acessar o link do site de qualquer outro dispositivo.
-Posso acessar do celular?
-Sim! O sistema é responsivo e funciona em celulares e tablets.
-Como atualizo o site depois?
-Edite o index.html e rode firebase deploy novamente no terminal.
+```
 
+> **Atenção:** essas regras permitem acesso público (leitura e escrita). Para uso interno isso é aceitável. Caso seja necessário restringir o acesso futuramente, é possível implementar autenticação por e-mail/senha.
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBJloGEReetkAN9SyWLsKtmGBY--15BVrE",
-  authDomain: "retifica-monteiro.firebaseapp.com",
-  projectId: "retifica-monteiro",
-  storageBucket: "retifica-monteiro.firebasestorage.app",
-  messagingSenderId: "379556838037",
-  appId: "1:379556838037:web:ea4008acaa2f83205d399c",
-  measurementId: "G-9Y6QDKCMG6"
-};
+---
+
+## Limites do Plano Gratuito (Spark)
+
+| Recurso     | Limite                         |
+|-------------|--------------------------------|
+| Firestore   | 1 GB de dados · 50 mil leituras/dia · 20 mil escritas/dia |
+| Storage     | 5 GB para arquivos             |
+| Hosting     | 10 GB de transferência/mês     |
+
+Para o volume de uso de uma retífica, esses limites são mais que suficientes.
+
+---
+
+## FAQ
+
+**Preciso pagar algo?**
+Não. O plano Spark do Firebase é gratuito dentro dos limites listados acima.
+
+**E se eu perder o computador?**
+Os dados ficam armazenados nos servidores do Google. Basta acessar a URL do site de qualquer dispositivo.
+
+**Posso acessar pelo celular?**
+Sim. A interface é responsiva e funciona em celulares e tablets.
+
+**Como atualizo o site?**
+Edite o `index.html` e execute `firebase deploy` novamente.
