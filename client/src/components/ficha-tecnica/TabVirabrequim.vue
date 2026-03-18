@@ -60,9 +60,9 @@ const itens6 = ['1', '2', '3', '4', '5', '6']
 
 const colsMoentes = ['A 0°', 'B 0°', 'C 0°', 'A 90°', 'B 90°', 'C 90°', 'CON']
 
-const d = new Proxy(props.modelValue, {
-  get(target, prop) { return target[prop] || '' },
-  set(target, prop, value) {
+const d = new Proxy({}, {
+  get(_, prop) { return props.modelValue?.[prop] || '' },
+  set(_, prop, value) {
     emit('update:modelValue', { ...props.modelValue, [prop]: value })
     return true
   }

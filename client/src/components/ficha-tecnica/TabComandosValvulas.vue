@@ -91,9 +91,9 @@ const linhas8 = [1, 2, 3, 4, 5, 6, 7, 8]
 const linhas16 = Array.from({ length: 16 }, (_, i) => i + 1)
 const itens8 = ['1', '2', '3', '4', '5', '6', '7', '8']
 
-const d = new Proxy(props.modelValue, {
-  get(target, prop) { return target[prop] || '' },
-  set(target, prop, value) {
+const d = new Proxy({}, {
+  get(_, prop) { return props.modelValue?.[prop] || '' },
+  set(_, prop, value) {
     emit('update:modelValue', { ...props.modelValue, [prop]: value })
     return true
   }

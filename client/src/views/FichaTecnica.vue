@@ -161,14 +161,18 @@ async function carregarDados() {
     }
     ordemDados.value = ordem
 
-    const dados = await carregarFicha(ordemId)
-    if (dados) {
-      Object.assign(ficha, dados)
-      ultimoSalvo.value = dados.atualizadoEm || ''
+    try {
+      const dados = await carregarFicha(ordemId)
+      if (dados) {
+        Object.assign(ficha, dados)
+        ultimoSalvo.value = dados.atualizadoEm || ''
+      }
+    } catch (fichaErr) {
+      console.warn('Ficha técnica ainda não existe, carregando vazia:', fichaErr)
     }
   } catch (e) {
-    console.error('Erro ao carregar ficha:', e)
-    alert('Erro ao carregar ficha técnica.')
+    console.error('Erro ao carregar OS:', e)
+    alert('Erro ao carregar ordem de serviço.')
   } finally {
     fichaCarregada.value = true
   }

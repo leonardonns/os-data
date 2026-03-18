@@ -34,9 +34,9 @@ const linhas6 = [1, 2, 3, 4, 5, 6]
 const itens6 = ['1', '2', '3', '4', '5', '6']
 const colsAngulos = ['0°A', '0°B', '45°A', '45°B', '85°A', '85°B', '135°A', '135°B', '180°A', '180°B', '225°A', '225°B', '265°A', '265°B', '315°A', '315°B']
 
-const d = new Proxy(props.modelValue, {
-  get(target, prop) { return target[prop] || '' },
-  set(target, prop, value) {
+const d = new Proxy({}, {
+  get(_, prop) { return props.modelValue?.[prop] || '' },
+  set(_, prop, value) {
     emit('update:modelValue', { ...props.modelValue, [prop]: value })
     return true
   }

@@ -81,9 +81,9 @@ const linhas8 = [1, 2, 3, 4, 5, 6, 7, 8]
 const angulos = ['0°', '45°', '135°', '180°', '225°', '265°', '315°']
 const colsCilindros = angulos.flatMap(a => [`${a}A`, `${a}B`, `${a}C`])
 
-const d = new Proxy(props.modelValue, {
-  get(target, prop) { return target[prop] || '' },
-  set(target, prop, value) {
+const d = new Proxy({}, {
+  get(_, prop) { return props.modelValue?.[prop] || '' },
+  set(_, prop, value) {
     emit('update:modelValue', { ...props.modelValue, [prop]: value })
     return true
   }

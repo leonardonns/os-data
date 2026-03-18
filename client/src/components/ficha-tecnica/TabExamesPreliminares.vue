@@ -72,9 +72,9 @@ import CampoMedida from './CampoMedida.vue'
 const props = defineProps({ modelValue: { type: Object, default: () => ({}) } })
 const emit = defineEmits(['update:modelValue'])
 
-const d = new Proxy(props.modelValue, {
-  get(target, prop) { return target[prop] || '' },
-  set(target, prop, value) {
+const d = new Proxy({}, {
+  get(_, prop) { return props.modelValue?.[prop] || '' },
+  set(_, prop, value) {
     emit('update:modelValue', { ...props.modelValue, [prop]: value })
     return true
   }
