@@ -57,11 +57,15 @@
             PDF, Word, Excel, TXT, ZIP e outros. {{ modoEdicao ? 'Os arquivos antigos continuam.' : '' }}
           </div>
         </div>
-        <div v-if="progresso > 0" class="full">
+        <div v-if="statusUpload.ativo" class="full">
           <div class="upload-progress">
-            <div class="upload-progress-bar" :style="{ width: progresso + '%' }"></div>
+            <div class="upload-progress-bar" :style="{ width: statusUpload.progresso + '%' }"></div>
           </div>
-          <div class="upload-status">Enviando... {{ Math.round(progresso) }}%</div>
+          <div class="upload-status">
+            <span v-if="statusUpload.fase === 'comprimindo'">Comprimindo foto {{ statusUpload.atual }} de {{ statusUpload.total }}...</span>
+            <span v-else-if="statusUpload.fase === 'enviando'">Enviando {{ statusUpload.atual }} de {{ statusUpload.total }}... {{ Math.round(statusUpload.progresso) }}%</span>
+            <span v-else-if="statusUpload.fase === 'salvando'">Salvando dados...</span>
+          </div>
         </div>
       </div>
 
@@ -100,7 +104,7 @@ import { useRoute, useRouter } from 'vue-router'
 import GaleriaFotos from '../components/GaleriaFotos.vue'
 import ListaArquivos from '../components/ListaArquivos.vue'
 import { carregarOrdens, criarOrdem, atualizarOrdem, gerarId } from '../services/ordens'
-import { uploadFoto, uploadArquivo, excluirFoto } from '../services/storage'
+import { uploadFotosEmLote, uploadArquivosEmLote, excluirFoto } from '../services/storage'
 
 const route = useRoute()
 const router = useRouter()
@@ -125,7 +129,13 @@ const form = reactive({
 const fotosExistentes = ref([])
 const arquivosExistentes = ref([])
 const salvando = ref(false)
-const progresso = ref(0)
+const statusUpload = reactive({
+  ativo: false,
+  atual: 0,
+  total: 0,
+  progresso: 0,
+  fase: ''
+})
 
 async function carregarDadosEdicao() {
   if (!modoEdicao.value) return
@@ -162,34 +172,42 @@ async function salvar() {
   }
 
   salvando.value = true
-  progresso.value = 0
+  statusUpload.ativo = false
 
   try {
     const id = registroId.value || gerarId()
     const fotoFiles = inputFotos.value?.files || []
     const arquivoFiles = inputArquivos.value?.files || []
-    const totalFiles = fotoFiles.length + arquivoFiles.length
-    let filesProcessed = 0
 
-    const onProgress = (pct) => {
-      if (totalFiles > 0) {
-        progresso.value = ((filesProcessed / totalFiles) * 100) + (pct / totalFiles)
-      }
+    let novasFotos = []
+    let errosFotos = []
+    if (fotoFiles.length > 0) {
+      statusUpload.ativo = true
+      const resultFotos = await uploadFotosEmLote(id, fotoFiles, (status) => {
+        statusUpload.atual = status.atual
+        statusUpload.total = status.total
+        statusUpload.progresso = status.progresso
+        statusUpload.fase = status.fase
+      })
+      novasFotos = resultFotos.resultados
+      errosFotos = resultFotos.erros
     }
 
-    const novasFotos = []
-    for (let i = 0; i < fotoFiles.length; i++) {
-      const foto = await uploadFoto(id, fotoFiles[i], onProgress)
-      novasFotos.push(foto)
-      filesProcessed++
+    let novosArquivos = []
+    let errosArquivos = []
+    if (arquivoFiles.length > 0) {
+      statusUpload.ativo = true
+      const resultArquivos = await uploadArquivosEmLote(id, arquivoFiles, (status) => {
+        statusUpload.atual = status.atual
+        statusUpload.total = status.total
+        statusUpload.progresso = status.progresso
+        statusUpload.fase = status.fase
+      })
+      novosArquivos = resultArquivos.resultados
+      errosArquivos = resultArquivos.erros
     }
 
-    const novosArquivos = []
-    for (let i = 0; i < arquivoFiles.length; i++) {
-      const arq = await uploadArquivo(id, arquivoFiles[i], onProgress)
-      novosArquivos.push(arq)
-      filesProcessed++
-    }
+    statusUpload.fase = 'salvando'
 
     const dados = {
       os: form.os.trim(),
@@ -207,12 +225,18 @@ async function salvar() {
       dados.fotos = [...fotosExistentes.value, ...novasFotos]
       dados.arquivos = [...arquivosExistentes.value, ...novosArquivos]
       await atualizarOrdem(id, dados)
-      alert('Registro atualizado com sucesso.')
     } else {
       dados.fotos = novasFotos
       dados.arquivos = novosArquivos
       await criarOrdem(id, dados)
-      alert('OS salva com sucesso.')
+    }
+
+    const totalErros = [...errosFotos, ...errosArquivos]
+    if (totalErros.length > 0) {
+      const nomes = totalErros.map(e => e.nome).join(', ')
+      alert(`Salvo com sucesso, mas ${totalErros.length} arquivo(s) falharam: ${nomes}`)
+    } else {
+      alert(modoEdicao.value ? 'Registro atualizado com sucesso.' : 'OS salva com sucesso.')
     }
 
     router.push('/')
@@ -221,7 +245,8 @@ async function salvar() {
     alert('Erro ao salvar: ' + e.message)
   } finally {
     salvando.value = false
-    progresso.value = 0
+    statusUpload.ativo = false
+    statusUpload.progresso = 0
   }
 }
 
