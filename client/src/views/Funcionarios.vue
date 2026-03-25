@@ -7,7 +7,7 @@
     <div class="card">
       <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
         <input v-model="busca" class="search" placeholder="Buscar por nome ou cargo..." style="flex:1; min-width:200px" />
-        <button class="primary" @click="abrirForm(null)">+ Novo Funcionário</button>
+        <button v-if="isAdmin" class="primary" @click="abrirForm(null)">+ Novo Funcionário</button>
       </div>
       <div class="small" style="margin-top: 8px">{{ filtrados.length }} funcionário(s)</div>
     </div>
@@ -24,17 +24,22 @@
           <div>
             <strong>{{ func.nome }}</strong>
             <span v-if="func.cargo" class="small"> — {{ func.cargo }}</span>
+            <span v-if="func.login" class="small"> ({{ func.login }})</span>
+            <div v-if="func.perfis?.length" class="perfis-lista">
+              <span v-for="p in func.perfis" :key="p" class="badge badge-perfil">{{ p }}</span>
+            </div>
           </div>
           <div class="func-acoes">
             <span class="badge" :class="func.ativo !== false ? 'badge-ativo' : 'badge-inativo'">
               {{ func.ativo !== false ? 'Ativo' : 'Inativo' }}
             </span>
             <button
+              v-if="isAdmin"
               class="btn-sm"
               :class="func.ativo !== false ? 'danger' : 'ok'"
               @click.stop="toggleAtivo(func)"
             >{{ func.ativo !== false ? 'Desativar' : 'Ativar' }}</button>
-            <button class="secondary btn-sm" @click.stop="abrirForm(func)">Editar</button>
+            <button v-if="isAdmin" class="secondary btn-sm" @click.stop="abrirForm(func)">Editar</button>
           </div>
         </div>
 
@@ -83,6 +88,9 @@ import {
   carregarMovimentacoesPorFuncionario
 } from '../services/funcionarios'
 import FormFuncionario from '../components/estoque/FormFuncionario.vue'
+import { useAuth } from '../composables/useAuth'
+
+const { isAdmin } = useAuth()
 
 const funcionarios = ref([])
 const busca = ref('')
@@ -194,6 +202,14 @@ onMounted(fetchDados)
 .badge-mov-devolucao { background: #fef3c7; color: #92400e; }
 
 .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+.perfis-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.badge-perfil { background: #eef2ff; color: #3730a3; }
 
 .func-detalhes {
   margin-top: 12px;

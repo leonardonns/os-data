@@ -24,7 +24,7 @@
     </div>
 
     <template v-else>
-      <div v-if="!itens.length && abaAtiva === 'itens'" class="card seed-card">
+      <div v-if="!itens.length && abaAtiva === 'itens' && isAdmin" class="card seed-card">
         <p>Nenhum item cadastrado ainda.</p>
         <p class="small">Deseja popular o estoque com <b>{{ totalSeed }}</b> itens padrão de retífica? (Peças, Ferramentas e EPIs)</p>
         <button class="primary" @click="executarSeed" :disabled="seedRodando">
@@ -36,6 +36,7 @@
       <TabItens
         v-if="abaAtiva === 'itens'"
         :itens="itens"
+        :admin="isAdmin"
         @novo-item="abrirFormItem(null)"
         @editar-item="abrirFormItem"
         @nova-movimentacao="abrirFormMov"
@@ -44,6 +45,7 @@
       <TabMovimentacoes
         v-if="abaAtiva === 'movimentacoes'"
         :movimentacoes="movimentacoes"
+        :admin="isAdmin"
         @nova-movimentacao="abrirFormMov('entrada')"
       />
 
@@ -73,7 +75,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useAuth } from '../composables/useAuth'
 import { carregarItens, carregarMovimentacoes, carregarSolicitacoesPendentes } from '../services/estoque'
+
+const { isAdmin } = useAuth()
 import { popularEstoqueInicial, TOTAL_ITENS_SEED } from '../services/seedEstoque'
 import TabItens from '../components/estoque/TabItens.vue'
 import TabMovimentacoes from '../components/estoque/TabMovimentacoes.vue'

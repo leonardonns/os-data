@@ -14,7 +14,7 @@
         <option value="peca">Peças</option>
       </select>
       <input v-model="busca" class="search" placeholder="Buscar por item ou funcionário..." />
-      <button class="primary" @click="$emit('nova-movimentacao')">+ Nova Movimentação</button>
+      <button v-if="admin" class="primary" @click="$emit('nova-movimentacao')">+ Nova Movimentação</button>
     </div>
 
     <div class="small" style="margin: 8px 0">{{ filtradas.length }} movimentação(ões)</div>
@@ -44,7 +44,8 @@
 import { ref, computed } from 'vue'
 
 const props = defineProps({
-  movimentacoes: { type: Array, default: () => [] }
+  movimentacoes: { type: Array, default: () => [] },
+  admin: { type: Boolean, default: false }
 })
 defineEmits(['nova-movimentacao'])
 

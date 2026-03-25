@@ -9,9 +9,9 @@
           <option value="ferramenta">Ferramentas</option>
           <option value="peca">Peças</option>
         </select>
-        <button class="primary" @click="$emit('novo-item')">+ Novo Item</button>
-        <button class="ok" @click="$emit('nova-movimentacao', 'entrada')">Entrada</button>
-        <button class="secondary" @click="$emit('nova-movimentacao', 'reserva')">Reservar</button>
+        <button v-if="admin" class="primary" @click="$emit('novo-item')">+ Novo Item</button>
+        <button v-if="admin" class="ok" @click="$emit('nova-movimentacao', 'entrada')">Entrada</button>
+        <button v-if="admin" class="secondary" @click="$emit('nova-movimentacao', 'reserva')">Reservar</button>
       </div>
     </div>
 
@@ -55,7 +55,7 @@
           <div><b>Estoque Mínimo</b>{{ item.estoqueMinimo ?? 0 }}</div>
         </div>
         <div class="detalhes-acoes">
-          <button class="secondary btn-sm" @click.stop="$emit('editar-item', item)">Editar</button>
+          <button v-if="admin" class="secondary btn-sm" @click.stop="$emit('editar-item', item)">Editar</button>
           <button class="secondary btn-sm" @click.stop="carregarHistorico(item.id)">
             {{ historicoItem === item.id ? 'Fechar histórico' : 'Ver histórico' }}
           </button>
@@ -80,7 +80,8 @@ import { ref, computed } from 'vue'
 import { buscarItensTexto, carregarMovimentacoesPorItem } from '../../services/estoque'
 
 const props = defineProps({
-  itens: { type: Array, default: () => [] }
+  itens: { type: Array, default: () => [] },
+  admin: { type: Boolean, default: false }
 })
 defineEmits(['novo-item', 'editar-item', 'nova-movimentacao'])
 

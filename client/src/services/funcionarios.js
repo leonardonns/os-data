@@ -40,10 +40,21 @@ export async function criarFuncionario(id, dados) {
   await setDoc(doc(db, 'funcionarios', id), {
     nome: dados.nome || '',
     cargo: dados.cargo || '',
+    login: dados.login || '',
+    senha: dados.senha || '',
+    perfis: dados.perfis || [],
     ativo: true,
     criadoEm: agora(),
     atualizadoEm: ''
   })
+}
+
+export async function buscarFuncionarioPorLogin(login) {
+  const q = query(colecaoRef, where('login', '==', login))
+  const snap = await getDocs(q)
+  if (snap.empty) return null
+  const d = snap.docs[0]
+  return { id: d.id, ...d.data() }
 }
 
 export async function atualizarFuncionario(id, dados) {
