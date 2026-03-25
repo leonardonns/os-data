@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import ListagemOS from '../views/ListagemOS.vue'
-import CadastroOS from '../views/CadastroOS.vue'
-import VisualizarOS from '../views/VisualizarOS.vue'
-import FichaTecnica from '../views/FichaTecnica.vue'
-import Estoque from '../views/Estoque.vue'
-import Funcionarios from '../views/Funcionarios.vue'
-import Login from '../views/Login.vue'
 import { useAuth } from '../composables/useAuth'
+
+const ListagemOS = () => import('../views/ListagemOS.vue')
+const CadastroOS = () => import('../views/CadastroOS.vue')
+const VisualizarOS = () => import('../views/VisualizarOS.vue')
+const FichaTecnica = () => import('../views/FichaTecnica.vue')
+const Estoque = () => import('../views/Estoque.vue')
+const Funcionarios = () => import('../views/Funcionarios.vue')
+const Login = () => import('../views/Login.vue')
 
 const routes = [
   { path: '/', name: 'listagem', component: ListagemOS, meta: { perfis: [] } },
