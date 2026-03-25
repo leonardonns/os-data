@@ -5,7 +5,7 @@
       <div v-for="(arq, idx) in arquivos" :key="idx" class="file-item">
         <span class="file-icon">{{ iconeArquivo(arq.nome) }}</span>
         <a :href="arq.url" target="_blank" rel="noopener" :title="arq.nome">{{ arq.nome }}</a>
-        <button class="danger" @click="$emit('remover', idx)">×</button>
+        <button v-if="!somenteLeitura" class="danger" @click="$emit('remover', idx)">×</button>
       </div>
     </div>
   </div>
@@ -13,7 +13,8 @@
 
 <script setup>
 defineProps({
-  arquivos: { type: Array, default: () => [] }
+  arquivos: { type: Array, default: () => [] },
+  somenteLeitura: { type: Boolean, default: false }
 })
 
 defineEmits(['remover'])

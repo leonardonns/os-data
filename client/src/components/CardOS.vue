@@ -9,6 +9,7 @@
         </div>
       </div>
       <div class="actions" style="margin-top: 0">
+        <RouterLink :to="`/visualizar/${ordem.id}`" class="btn secondary">Visualizar</RouterLink>
         <RouterLink :to="`/ficha-tecnica/${ordem.id}`" class="btn ficha-btn">Ficha Técnica</RouterLink>
         <RouterLink :to="`/editar/${ordem.id}`" class="btn primary">Editar</RouterLink>
         <button class="danger" @click="$emit('excluir', ordem.id)">Excluir</button>
@@ -26,11 +27,7 @@
       <div><b>Serviço executado</b><span v-html="servicoFormatado"></span></div>
     </div>
 
-    <GaleriaFotos
-      :fotos="ordem.fotos || []"
-      :registro-id="ordem.id"
-      @remover="(idx) => $emit('remover-foto', ordem.id, idx)"
-    />
+    <CarrosselFotos :fotos="ordem.fotos || []" />
 
     <ListaArquivos
       :arquivos="ordem.arquivos || []"
@@ -41,14 +38,14 @@
 
 <script setup>
 import { computed } from 'vue'
-import GaleriaFotos from './GaleriaFotos.vue'
+import CarrosselFotos from './CarrosselFotos.vue'
 import ListaArquivos from './ListaArquivos.vue'
 
 const props = defineProps({
   ordem: { type: Object, required: true }
 })
 
-defineEmits(['excluir', 'remover-foto', 'remover-arquivo'])
+defineEmits(['excluir', 'remover-arquivo'])
 
 const servicoFormatado = computed(() => {
   return (props.ordem.servico || '-').replace(/\n/g, '<br>')

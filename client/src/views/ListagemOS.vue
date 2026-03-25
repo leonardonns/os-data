@@ -33,7 +33,6 @@
         :key="ordem.id"
         :ordem="ordem"
         @excluir="handleExcluir"
-        @remover-foto="handleRemoverFoto"
         @remover-arquivo="handleRemoverArquivo"
       />
     </template>
@@ -92,21 +91,6 @@ async function handleExcluir(id) {
   }
 
   await excluirOrdem(id)
-  await fetchDados()
-}
-
-async function handleRemoverFoto(registroId, indiceFoto) {
-  if (!confirm('Deseja remover esta foto?')) return
-  const reg = dados.value.find(r => r.id === registroId)
-  if (!reg) return
-
-  const foto = reg.fotos[indiceFoto]
-  await excluirFoto(foto.path)
-
-  const novasFotos = [...reg.fotos]
-  novasFotos.splice(indiceFoto, 1)
-
-  await atualizarOrdem(registroId, { fotos: novasFotos })
   await fetchDados()
 }
 
