@@ -12,6 +12,13 @@
           <input id="os" v-model="form.os" placeholder="Ex.: 1543" />
         </div>
         <div>
+          <label for="funcionario">Funcionário Responsável</label>
+          <select id="funcionario" v-model="form.funcionarioId" @change="onFuncionarioChange">
+            <option value="">Selecione...</option>
+            <option v-for="f in funcionariosAtivos" :key="f.id" :value="f.id">{{ f.nome }}</option>
+          </select>
+        </div>
+        <div>
           <label for="proprietario">Nome Proprietário</label>
           <input id="proprietario" v-model="form.proprietario" placeholder="Nome do proprietário" />
         </div>
@@ -69,7 +76,13 @@
         </div>
       </div>
 
-      <div class="actions">
+      <PecasOS
+        v-model="form.pecas"
+        :ordem-id="registroId || idGerado"
+        :ordem-numero="form.os"
+      />
+
+      <div class="actions" style="margin-top: 16px">
         <button class="primary" @click="salvar" :disabled="salvando">
           <span v-if="salvando"><span class="spinner"></span>Salvando...</span>
           <span v-else>{{ modoEdicao ? 'Salvar alterações' : 'Salvar OS' }}</span>
@@ -103,8 +116,10 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GaleriaFotos from '../components/GaleriaFotos.vue'
 import ListaArquivos from '../components/ListaArquivos.vue'
+import PecasOS from '../components/PecasOS.vue'
 import { carregarOrdens, criarOrdem, atualizarOrdem, gerarId } from '../services/ordens'
 import { uploadFotosEmLote, uploadArquivosEmLote, excluirFoto } from '../services/storage'
+import { carregarFuncionarios } from '../services/funcionarios'
 
 const route = useRoute()
 const router = useRouter()
@@ -113,9 +128,13 @@ const inputArquivos = ref(null)
 
 const registroId = computed(() => route.params.id || '')
 const modoEdicao = computed(() => !!route.params.id)
+const idGerado = ref('')
+const funcionariosAtivos = ref([])
 
 const form = reactive({
   os: '',
+  funcionarioId: '',
+  funcionarioNome: '',
   proprietario: '',
   motor: '',
   chassi: '',
@@ -123,8 +142,14 @@ const form = reactive({
   numeroBloco: '',
   placa: '',
   veiculo: '',
-  servico: ''
+  servico: '',
+  pecas: []
 })
+
+function onFuncionarioChange() {
+  const f = funcionariosAtivos.value.find(f => f.id === form.funcionarioId)
+  form.funcionarioNome = f?.nome || ''
+}
 
 const fotosExistentes = ref([])
 const arquivosExistentes = ref([])
@@ -138,7 +163,17 @@ const statusUpload = reactive({
 })
 
 async function carregarDadosEdicao() {
-  if (!modoEdicao.value) return
+  try {
+    funcionariosAtivos.value = await carregarFuncionarios(true)
+  } catch (e) {
+    console.error('Erro ao carregar funcionários:', e)
+  }
+
+  if (!modoEdicao.value) {
+    idGerado.value = gerarId()
+    return
+  }
+
   try {
     const ordens = await carregarOrdens()
     const reg = ordens.find(r => r.id === registroId.value)
@@ -148,6 +183,8 @@ async function carregarDadosEdicao() {
       return
     }
     form.os = reg.os || ''
+    form.funcionarioId = reg.funcionarioId || ''
+    form.funcionarioNome = reg.funcionarioNome || ''
     form.proprietario = reg.proprietario || reg.cliente || ''
     form.motor = reg.motor || ''
     form.chassi = reg.chassi || ''
@@ -156,6 +193,7 @@ async function carregarDadosEdicao() {
     form.placa = reg.placa || ''
     form.veiculo = reg.veiculo || ''
     form.servico = reg.servico || ''
+    form.pecas = reg.pecas || []
     fotosExistentes.value = reg.fotos || []
     arquivosExistentes.value = reg.arquivos || []
   } catch (e) {
@@ -175,7 +213,7 @@ async function salvar() {
   statusUpload.ativo = false
 
   try {
-    const id = registroId.value || gerarId()
+    const id = registroId.value || idGerado.value || gerarId()
     const fotoFiles = inputFotos.value?.files || []
     const arquivoFiles = inputArquivos.value?.files || []
 
@@ -211,6 +249,8 @@ async function salvar() {
 
     const dados = {
       os: form.os.trim(),
+      funcionarioId: form.funcionarioId,
+      funcionarioNome: form.funcionarioNome,
       proprietario: form.proprietario.trim(),
       motor: form.motor.trim(),
       chassi: form.chassi.trim(),
@@ -218,7 +258,8 @@ async function salvar() {
       numeroBloco: form.numeroBloco.trim(),
       placa: form.placa.trim(),
       veiculo: form.veiculo.trim(),
-      servico: form.servico.trim()
+      servico: form.servico.trim(),
+      pecas: form.pecas || []
     }
 
     if (modoEdicao.value) {
@@ -300,5 +341,14 @@ onMounted(carregarDadosEdicao)
 .ficha-btn {
   background: #e8f5e9;
   color: #137333;
+}
+
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
 }
 </style>
