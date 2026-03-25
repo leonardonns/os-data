@@ -21,6 +21,8 @@ export const PERFIS_DISPONIVEIS = [
   'Soldador'
 ]
 
+export const PERFIS_CADASTRO = PERFIS_DISPONIVEIS.filter(p => p !== 'Administrador')
+
 const SESSAO_KEY = 'rm_sessao'
 const colecaoRef = collection(db, 'funcionarios')
 
@@ -86,8 +88,8 @@ export async function seedAdmin() {
   const senhaHash = await hashSenha('admin123')
   const agora = new Date().toLocaleString('pt-BR')
   const admins = [
-    { nome: 'Vinicius Monteiro', cargo: 'Administrador', login: 'vinicius' },
-    { nome: 'Leonardo Neves', cargo: 'Administrador', login: 'leonardo' }
+    { nome: 'Vinicius Monteiro', login: 'vinicius' },
+    { nome: 'Leonardo Neves', login: 'leonardo' }
   ]
 
   const snap = await getDocs(colecaoRef)
@@ -107,7 +109,6 @@ export async function seedAdmin() {
       const novoId = doc(colecaoRef).id
       await setDoc(doc(db, 'funcionarios', novoId), {
         nome: admin.nome,
-        cargo: admin.cargo,
         login: admin.login,
         senha: senhaHash,
         perfis: ['Administrador'],

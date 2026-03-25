@@ -39,7 +39,6 @@ export async function buscarFuncionario(id) {
 export async function criarFuncionario(id, dados) {
   await setDoc(doc(db, 'funcionarios', id), {
     nome: dados.nome || '',
-    cargo: dados.cargo || '',
     login: dados.login || '',
     senha: dados.senha || '',
     perfis: dados.perfis || [],

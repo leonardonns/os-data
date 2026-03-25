@@ -3,15 +3,9 @@
     <div class="modal-card">
       <h2>{{ editando ? 'Editar Funcionário' : 'Novo Funcionário' }}</h2>
 
-      <div class="grid">
-        <div>
-          <label>Nome *</label>
-          <input v-model="form.nome" placeholder="Nome completo" />
-        </div>
-        <div>
-          <label>Cargo</label>
-          <input v-model="form.cargo" placeholder="Ex: Mecânico, Torneiro..." />
-        </div>
+      <div>
+        <label>Nome *</label>
+        <input v-model="form.nome" placeholder="Nome completo" />
       </div>
 
       <h3 class="secao-titulo">Acesso ao Sistema</h3>
@@ -30,7 +24,7 @@
       <div class="full" style="margin-top: 12px">
         <label>Perfis</label>
         <div class="perfis-grid">
-          <label v-for="p in PERFIS_DISPONIVEIS" :key="p" class="perfil-check">
+          <label v-for="p in PERFIS_CADASTRO" :key="p" class="perfil-check">
             <input type="checkbox" :value="p" v-model="form.perfis" />
             <span>{{ p }}</span>
           </label>
@@ -51,7 +45,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { gerarIdFuncionario, criarFuncionario, atualizarFuncionario, buscarFuncionarioPorLogin } from '../../services/funcionarios'
-import { hashSenha, PERFIS_DISPONIVEIS } from '../../services/auth'
+import { hashSenha, PERFIS_CADASTRO } from '../../services/auth'
 
 const props = defineProps({
   funcionario: { type: Object, default: null }
@@ -63,7 +57,6 @@ const salvando = ref(false)
 
 const form = reactive({
   nome: props.funcionario?.nome || '',
-  cargo: props.funcionario?.cargo || '',
   login: props.funcionario?.login || '',
   senha: '',
   perfis: props.funcionario?.perfis ? [...props.funcionario.perfis] : []
@@ -87,7 +80,6 @@ async function salvar() {
   try {
     const dados = {
       nome: form.nome.trim(),
-      cargo: form.cargo.trim(),
       login: form.login.trim(),
       perfis: form.perfis
     }

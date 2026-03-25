@@ -6,7 +6,7 @@
 
     <div class="card">
       <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
-        <input v-model="busca" class="search" placeholder="Buscar por nome ou cargo..." style="flex:1; min-width:200px" />
+        <input v-model="busca" class="search" placeholder="Buscar por nome..." style="flex:1; min-width:200px" />
         <button v-if="isAdmin" class="primary" @click="abrirForm(null)">+ Novo Funcionário</button>
       </div>
       <div class="small" style="margin-top: 8px">{{ filtrados.length }} funcionário(s)</div>
@@ -23,7 +23,6 @@
         <div class="record-top">
           <div>
             <strong>{{ func.nome }}</strong>
-            <span v-if="func.cargo" class="small"> — {{ func.cargo }}</span>
             <span v-if="func.login" class="small"> ({{ func.login }})</span>
             <div v-if="func.perfis?.length" class="perfis-lista">
               <span v-for="p in func.perfis" :key="p" class="badge badge-perfil">{{ p }}</span>
@@ -107,8 +106,7 @@ const filtrados = computed(() => {
   const q = busca.value.toLowerCase().trim()
   if (!q) return funcionarios.value
   return funcionarios.value.filter(f =>
-    (f.nome || '').toLowerCase().includes(q) ||
-    (f.cargo || '').toLowerCase().includes(q)
+    (f.nome || '').toLowerCase().includes(q)
   )
 })
 
