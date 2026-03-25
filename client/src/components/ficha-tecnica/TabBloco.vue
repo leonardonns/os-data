@@ -15,7 +15,7 @@
     <CampoCheck label="Planicidade traseira" v-model="d.planicidadeTraseira" />
 
     <TabelaMedicao
-      titulo="Altura dos Pistões"
+      titulo="Altura de camisa"
       :colunas="['A', 'B', 'C', 'D']"
       :linhas="linhas6"
       v-model="d.alturaPistoes"
